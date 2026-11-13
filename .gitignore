@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+models/
+*.gguf
+*.safetensors
+data/
+*.log
+.DS_Store
