@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LocalStage AI</title>
+<style>body{max-width:760px;margin:60px auto;padding:24px;background:#101521;color:#e8eefa;font:18px system-ui}textarea,input,button{box-sizing:border-box;padding:12px;border:1px solid #52647d;border-radius:8px;background:#1a2639;color:inherit}textarea{width:100%;height:100px}button{cursor:pointer;margin:12px 0}#answer{white-space:pre-wrap;line-height:1.7}small{color:#b3c6dd}</style>
+<h1>LocalStage AI</h1><p>Aster's character connection demo</p>
+<p><small>Mock mode gives a fixed reply. Connect a model server for AI replies. This demo has no avatar renderer.</small></p>
+<form id="chat"><label for="message">Your message</label><textarea id="message" maxlength="4000" required></textarea>
+<p><label>Gateway key (only if configured) <input id="key" type="password" autocomplete="off"></label></p>
+<label><input id="voice" type="checkbox"> Read reply aloud using browser speech</label><br>
+<small>Browser voices may use online services, depending on your browser and OS.</small><br>
+<button id="send">Send message</button></form><div id="answer" role="status" aria-live="polite"></div>
+<script>
+const form=document.querySelector('#chat'),answer=document.querySelector('#answer'),button=document.querySelector('#send');
+form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;answer.textContent='Thinking…';
+try{const headers={'Content-Type':'application/json'},key=document.querySelector('#key').value;if(key)headers.Authorization='Bearer '+key;
+const response=await fetch('/v1/chat',{method:'POST',headers,body:JSON.stringify({messages:[{role:'user',content:document.querySelector('#message').value}]})});
+const data=await response.json();if(!response.ok)throw new Error(data.error);answer.textContent=data.text+'\n\n'+data.metrics.response_ms+' ms';
+if(document.querySelector('#voice').checked&&'speechSynthesis' in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(data.text));}
+}catch(error){answer.textContent=error.message;}finally{button.disabled=false;}});
+</script></html>
